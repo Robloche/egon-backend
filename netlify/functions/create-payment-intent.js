@@ -1,24 +1,57 @@
-// Stripe private key
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+import Stripe from 'stripe';
 
-exports.handler = async(event) => {
-  console.log(event);
+// Stripe private key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2025-08-27.basil',
+});
+
+export const handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    // Preflight requests (CORS)
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN,
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST,OPTIONS',
+      },
+      body: '',
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN,
+      },
+      body: JSON.stringify({ error: 'Unauthorized method' }),
+    };
+  }
 
   try {
-    const intent = await stripe.paymentIntents.create({
-      amount: 2000, // En centimes (20,00 € ici)
+    const { amount, currency } = JSON.parse(event.body);
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
       automatic_payment_methods: { enabled: true },
-      currency: 'eur',
     });
 
     return {
-      body: JSON.stringify({ clientSecret: intent.client_secret }),
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN,
+      },
+      body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
-  } catch (err) {
+  } catch (error) {
     return {
-      body: JSON.stringify({ error: err.message }),
-      statusCode: 500,
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN,
+      },
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
