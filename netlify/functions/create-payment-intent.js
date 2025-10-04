@@ -1,7 +1,5 @@
-/* @flow */
-
 // Stripe private key
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY_TEST);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async(event) => {
   console.log(event);
