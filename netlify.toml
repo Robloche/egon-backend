@@ -1,6 +1,13 @@
-[functions]
-directory = "netlify/functions"
+[build]
+functions = "netlify/functions"
 
 [dev]
-framework = "#static" # force un serveur statique simple
+framework = "#static"
 autoLaunch = false
+
+[[headers]]
+for = "/.netlify/functions/*"
+[headers.values]
+Access-Control-Allow-Origin = "*"
+Access-Control-Allow-Headers = "Content-Type"
+Access-Control-Allow-Methods = "POST, OPTIONS"
