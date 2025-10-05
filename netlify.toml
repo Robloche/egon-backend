@@ -7,7 +7,8 @@ autoLaunch = false
 
 [[headers]]
 for = "/.netlify/functions/*"
-[headers.values]
-Access-Control-Allow-Origin = "*"
-Access-Control-Allow-Headers = "Content-Type"
-Access-Control-Allow-Methods = "POST, OPTIONS"
+    [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Methods = "POST, OPTIONS"
+    Access-Control-Max-Age = "86400"
